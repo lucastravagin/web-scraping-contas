@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer')
-const url = 'https://meutim.tim.com.br/novo/login?bmctx=8B94D49C137CCFE1FA9512A461AC79DB4FBA69EFB5FA39109654FE9A6E39100A&contextType=external&username=string&enablePersistentLogin=true&contextValue=%2Foam&password=secure_string&challenge_url=https%3A%2F%2Fmeutim.tim.com.br%2Fnovo%2Flogin&request_id=-6163604974841247348&authn_try_count=0&locale=pt_BR&resource_url=https%253A%252F%252Fmeutim.tim.com.br%252F'
+const url = 'https://meutim.tim.com.br/novo/login'
 
 
 let scrape = async () => {
@@ -11,12 +11,39 @@ let scrape = async () => {
         await page.evaluate(() => {
             document.getElementById('campo-numero').value = '11984167366'
             document.getElementById('campo-senha').value = '9118'
+            document.getElementById('btn-entrar').disabled = false;
+            //document.getElementById('btn-entrar').click()
+        })
+
+
+
+        await page.evaluate(() => {
             document.getElementById('btn-entrar').click()
         })
-        
-        await page.screenshot({path: 'tim.png'})
+        await page.waitForNavigation()
+        await page.waitFor(2000)
+
+        await page.evaluate(() => {
+            document.querySelector('.setinha-ultimas-contas').click()
+            document.querySelector('#button_codigo_barras > button').click()
+        })
+
+        await page.waitFor(2000)
+
+        const result = await page.evaluate(() => {
+            let conta = {}
+            conta.vencimento = document.querySelector('.texto-mes > span').innerText
+            conta.status = document.querySelector('.status > span').innerText
+            conta.valorDesconto = document.querySelector('.desc-pagamento').innerText
+            conta.valor = document.querySelector('.valor-conta span:nth-child(2)').innerText
+            conta.codigo_barras = document.querySelector('.codigo-num p span').innerText
+            return conta
+        })
+        //await page.screenshot({path: 'tim.png'})
+        browser.close()
+        return result
     } catch (error) {
-        console.log('Erro ao buscar contas da Sky' + error)
+        console.log('Erro ao buscar contas da Tim' + error)
     }
 }
 scrape().then((value) => {
