@@ -12,7 +12,7 @@ let scrape = async () => {
 
         await console.log('Acessou a página e foi está inserindo RGI no Input');
         
-
+        
         await page.evaluate(() => { // O Evaluate serve para executar código javascript diretamente do navegador 
             document.querySelectorAll('table > tbody > tr:nth-child(1) > td > input')[0].value = '0790409500';
             document.getElementById('frmhome:j_id172').click()
@@ -56,7 +56,7 @@ let scrape = async () => {
        
         const selector = 'html > body > form > div:nth-child(8) > div > table > tbody > tr';
 
-        //Buscando os dados da conta
+        
         const result = await page.$$eval(selector, trs => trs.map(tr => {
             const tds = [...tr.getElementsByTagName('td')];
             return tds.map(td => td.innerText);
